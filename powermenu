@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+case $(printf "logout\\nshutdown\\nrestart" | rofi -dmenu -i -p 'power') in
+	logout) mate-session-save --logout ;;
+	shutdown) poweroff ;;
+	restart) reboot ;;
+esac
