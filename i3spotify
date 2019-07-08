@@ -3,7 +3,7 @@
 SPOTPID="$(pgrep -x spotify)"
 
 if [[ -z $SPOTPID ]]; then
-	spotify & > /dev/null
+	flatpak run com.spotify.Client & > /dev/null
 else
 	i3-msg workspace "100:spotify"
 fi

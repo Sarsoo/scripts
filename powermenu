@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-case $(printf "logout\\nshutdown\\nrestart" | rofi -dmenu -i -p 'power') in
+case $(printf "lock\\nlogout\\nshutdown\\nrestart" | rofi -dmenu -i -p 'power') in
+	lock) i3exit lock ;;
 	logout) mate-session-save --logout ;;
 	shutdown) poweroff ;;
 	restart) reboot ;;
