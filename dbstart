@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+brew services start postgresql@14
+brew services start redis
