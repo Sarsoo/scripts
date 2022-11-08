@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+echo ">> updating everything....."
+echo
+echo 
+
+echo ">> updating local brew dependencies...."
+echo 
+brew update
+echo 
+echo 
+echo ">> which leaves these outdated...."
+echo
+brew outdated
+echo
+read -p ">> upgrade? (y/n) " updatebrew
+
+if [ updatebrew = "y" ]; then
+    echo ">> upgrading......"
+    brew upgrade
+fi
+
+echo
+echo
+echo ">> updating ansible environment...."
+cd ~/dev/infra/ansible
+poetry update
+
+echo
+echo
+echo ">> running a few playbooks...."
+echo 
+./update
