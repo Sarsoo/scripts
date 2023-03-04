@@ -1,33 +1,44 @@
 #!/usr/bin/env bash
 
 echo ">> updating everything....."
-echo
-echo 
 
 echo ">> updating local brew dependencies...."
-echo 
 brew update
-echo 
-echo 
+
 echo ">> which leaves these outdated...."
-echo
 brew outdated
 echo
 read -p ">> upgrade? (y/n) " updatebrew
 
-if [ updatebrew = "y" ]; then
+if [ $updatebrew == "y" ]; then
     echo ">> upgrading......"
     brew upgrade
 fi
 
-echo
-echo
-echo ">> updating ansible environment...."
-cd ~/dev/infra/ansible
-poetry update
+echo 
+echo ">> checking terraform diff...."
+cd ~/dev/infra/terraform
+terraform plan
 
 echo
+read -p ">> apply terraform changes? (y/n) " updateterraform
+
+if [ $updateterraform == "y" ]; then
+    echo ">> applying......"
+    terraform apply -auto-approve
+fi
+
+echo
+read -p ">> update ansible environment? (y/n) " updateansible
+
+if [ $updateansible == "y" ]; then
+    echo ">> upgrading......"
+    cd ~/dev/infra/ansible
+    poetry update
+fi
+
 echo
 echo ">> running a few playbooks...."
 echo 
+cd ~/dev/infra/ansible
 ./update
