@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+brew leaves --installed-on-request | sed '/\(fuse.*\)/d' > $SCRIPT_DIR/brew.txt
+brew list --cask -l1 | sed '/\(fuse.*\)/d' > $SCRIPT_DIR/brew-cask.txt
+brew tap | sed '/homebrew\/services/d' > $SCRIPT_DIR/brew-tap.txt

@@ -1,0 +1,9 @@
+colima start
+
+cd ~/lab/gitea-actions
+docker-compose up -d
+
+cd ~/lab/cadvisor
+docker-compose up -d
+
+

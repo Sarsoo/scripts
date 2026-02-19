@@ -15,18 +15,18 @@ if [ $updatebrew == "y" ]; then
     brew upgrade
 fi
 
-echo 
-echo ">> checking terraform diff...."
-cd ~/dev/infra/terraform
-terraform plan
+# echo
+# echo ">> checking terraform diff...."
+# cd ~/dev/infra/terraform
+# terraform plan
 
-echo
-read -p ">> apply terraform changes? (y/n) " updateterraform
+# echo
+# read -p ">> apply terraform changes? (y/n) " updateterraform
 
-if [ $updateterraform == "y" ]; then
-    echo ">> applying......"
-    terraform apply -auto-approve
-fi
+# if [ $updateterraform == "y" ]; then
+#     echo ">> applying......"
+#     terraform apply -auto-approve
+# fi
 
 echo
 read -p ">> update ansible environment? (y/n) " updateansible
@@ -34,11 +34,11 @@ read -p ">> update ansible environment? (y/n) " updateansible
 if [ $updateansible == "y" ]; then
     echo ">> upgrading......"
     cd ~/dev/infra/ansible
-    poetry update
+    just pyupdate
 fi
 
 echo
 echo ">> running a few playbooks...."
-echo 
-cd ~/dev/infra/ansible
-make all
+echo
+cdans
+just

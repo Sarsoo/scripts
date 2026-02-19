@@ -1,0 +1,15 @@
+calibre
+companion
+gimp
+godot
+gramps
+libreoffice
+linearmouse
+mactex
+postman
+prismlauncher
+pug
+swiftdefaultappsprefpane
+temurin
+transmission
+ungoogled-chromium

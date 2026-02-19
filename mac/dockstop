@@ -1,0 +1,10 @@
+
+cd ~/lab/gitea-actions
+docker-compose down
+
+cd ~/lab/cadvisor
+docker-compose down
+
+brew services stop node_exporter
+
+colima stop

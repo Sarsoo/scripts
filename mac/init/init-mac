@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+###################
+#   HOMEBREW
+###################
+
+if [ ! command -v foo &> /dev/null ]; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+else
+    echo "Homebrew installed..."
+fi
+
+HOMEBREW_NO_INSTALL_UPGRADE=1 brew install $(cat $SCRIPT_DIR/brew.txt)
+HOMEBREW_NO_INSTALL_UPGRADE=1 brew install --cask $(cat $SCRIPT_DIR/brew-cask.txt)
+
+for i in `cat $SCRIPT_DIR/brew-tap.txt`
+do
+    echo "$i"
+    brew tap $i
+done
