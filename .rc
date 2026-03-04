@@ -1,0 +1,22 @@
+
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Linux*)     machine=Linux;;
+    Darwin*)    machine=Mac;;
+    CYGWIN*)    machine=Cygwin;;
+    MINGW*)     machine=MinGw;;
+    MSYS_NT*)   machine=MSys;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
+SAR_SCRIPT_ROOT=${SAR_SCRIPT_ROOT:-"$HOME/scripts"}
+
+if [ $machine = "Mac" ]; then
+    alias dbstart="$SAR_SCRIPT_ROOT/mac/dbstart"
+    alias dbstop="$SAR_SCRIPT_ROOT/mac/dbstop"
+    alias dockstart="$SAR_SCRIPT_ROOT/mac/dockstart"
+    alias dockstop="$SAR_SCRIPT_ROOT/mac/dockstop"
+    alias sarpdate="$SAR_SCRIPT_ROOT/mac/sarpdate"
+fi
+
+alias youtube-dl-audio="$SAR_SCRIPT_ROOT/youtube-dl-audio"

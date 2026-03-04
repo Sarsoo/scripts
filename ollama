@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-ssh -t insp docker exec -it ollama ollama run llama2-uncensored
