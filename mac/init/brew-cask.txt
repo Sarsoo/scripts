@@ -1,5 +1,6 @@
 calibre
 companion
+freelens
 gimp
 godot
 gramps

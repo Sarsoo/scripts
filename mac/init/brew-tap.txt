@@ -1,4 +1,6 @@
 derailed/k9s
+dgunzy/tap
+fluxcd/tap
 leg100/tap
 macos-fuse-t/cask
 music-assistant/tap
