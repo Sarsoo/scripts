@@ -11,12 +11,10 @@ esac
 
 SAR_SCRIPT_ROOT=${SAR_SCRIPT_ROOT:-"$HOME/scripts"}
 
-if [ $machine = "Mac" ]; then
-    alias dbstart="$SAR_SCRIPT_ROOT/mac/dbstart"
-    alias dbstop="$SAR_SCRIPT_ROOT/mac/dbstop"
-    alias dockstart="$SAR_SCRIPT_ROOT/mac/dockstart"
-    alias dockstop="$SAR_SCRIPT_ROOT/mac/dockstop"
-    alias sarpdate="$SAR_SCRIPT_ROOT/mac/sarpdate"
-fi
+export PATH="$PATH:${SAR_SCRIPT_ROOT}/dev"
+export PATH="$PATH:${SAR_SCRIPT_ROOT}/net"
+export PATH="$PATH:${SAR_SCRIPT_ROOT}/util"
 
-alias youtube-dl-audio="$SAR_SCRIPT_ROOT/youtube-dl-audio"
+if [ $machine = "Mac" ]; then
+    export PATH="$PATH:${SAR_SCRIPT_ROOT}/mac"
+fi

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 brew services stop postgresql@14
 brew services stop redis

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 SPOTPID="$(pgrep -x spotify)"
 
@@ -7,4 +8,3 @@ if [[ -z $SPOTPID ]]; then
 else
 	i3-msg workspace "100:spotify"
 fi
-
