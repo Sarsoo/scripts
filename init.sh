@@ -31,6 +31,7 @@ fedora_packages=(
   'rsync'
   'curl'
   'traceroute'
+  'gitui'
 )
 
 init_debian(){
