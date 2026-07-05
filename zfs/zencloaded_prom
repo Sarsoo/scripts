@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+STATUSES=`zfs list -t filesystem,volume -o name,keystatus -H | grep available --color=never`
+
+output_format_awk="$(
+  cat <<'OUTPUTAWK'
+BEGIN { v = "" }
+v != $1 {
+  print "# HELP zfs_" $1 " ZFS key status available " $1;
+  print "# TYPE zfs_" $1 " gauge";
+  v = $1
+}
+{print "zfs_" $0}
+OUTPUTAWK
+)"
+
+format_output() {
+  # sort
+  sort |
+    awk -F'{' "${output_format_awk}"
+}
+
+TIMESTAMP=$(($(date +%s%N)/1000000))
+
+IFS=$'\n'
+for device in ${STATUSES}; do
+    dataset="$(echo "${device}" | cut -f1)"
+    status="$(echo "${device}" | cut -f2)"
+
+    if [ $status == 'available' ]; then
+      echo "dataset_keystatus{dataset=\"${dataset}\",status=\"available\"} 1"
+      echo "dataset_keystatus{dataset=\"${dataset}\",status=\"unavailable\"} 0"
+    else
+      echo "dataset_keystatus{dataset=\"${dataset}\",status=\"available\"} 0"
+      echo "dataset_keystatus{dataset=\"${dataset}\",status=\"unavailable\"} 1"
+    fi
+done | format_output

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+zfs list -o name,used,usedbysnapshots,avail,refer,mountpoint,mounted,compression,compressratio,snapshots_changed,recordsize,keystatus

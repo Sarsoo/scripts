@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+UNLOADED=`zfs list -H -t filesystem -o keystatus | grep -i unavailable | wc -l`
+
+echo $UNLOADED
+exit $UNLOADED
