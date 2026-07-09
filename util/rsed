@@ -19,4 +19,13 @@ done
 [[ -z "${file}" ]] && exit 1;
 [[ -z "${sed}" ]] && exit 1;
 
-find . -type f -name "${file}" -print0 | xargs -0 sed -i "${sed}"
+case "$(uname -s)" in
+    Darwin*)    machine=Mac;;
+    *)          machine="UNKNOWN:${unameOut}"
+esac
+
+if [[ "${machine}" == "Mac" ]] then;
+  find . -type f -name "${file}" -print0 | xargs -0 sed -i '' "${sed}"
+else
+  find . -type f -name "${file}" -print0 | xargs -0 sed -i "${sed}"
+fi
