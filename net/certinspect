@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+output=""
+raw=0
+positionals=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -o|--out)
+            output="$2"
+            shift 2
+            ;;
+        -r|--raw)
+            raw=1
+            shift 1
+            ;;
+        *)
+            positionals+=("$1")
+            shift
+            ;;
+    esac
+done
+
+output_args=("x509" "-inform" "pem")
+
+if [[ -n "${output}" ]]; then
+  output_args+=("-outform" "PEM" "-out" "${output}")
+else
+  output_args+=("-noout" "-text")
+fi
+
+cert_value=$(openssl s_client -showcerts -connect "${positionals[0]}" </dev/null 2>/dev/null)
+
+if [[ $? != 0 ]]; then
+  echo "Failed to connect to \"${positionals[0]}\"" >&2
+  exit 1
+fi
+
+echo "${cert_value}" | openssl "${output_args[@]}"
