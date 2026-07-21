@@ -63,8 +63,8 @@ init_dotfiles() {
 
   if ! command -v git >/dev/null 2>&1
   then
-      echo "err: git could not be found" >&2
-      return 1
+    echo "err: git could not be found" >&2
+    return 1
   fi
 
   git clone https://github.com/Sarsoo/dotfiles.git "${HOME}/dotfiles"
@@ -86,8 +86,8 @@ init_scripts() {
 
   if ! command -v git >/dev/null 2>&1
   then
-      echo "err: git could not be found" >&2
-      return 1
+    echo "err: git could not be found" >&2
+    return 1
   fi
 
   git clone https://github.com/Sarsoo/scripts.git "${HOME}/scripts"
@@ -95,6 +95,17 @@ init_scripts() {
   if [[ $? != 0 ]]; then
     echo "err: failed to checkout scripts" >&2
     return 1
+  fi
+}
+
+init_helm_plugins() {
+
+  if command -v helm >/dev/null 2>&1
+  then
+    helm plugin install https://github.com/databus23/helm-diff --verify=false &>/dev/null
+    # helm plugin install https://github.com/dadav/helm-schema --verify=false &>/dev/null
+  else
+    echo "warn: skipping helm plugins, helm could not be found" >&2
   fi
 }
 
@@ -110,3 +121,4 @@ fi
 
 init_dotfiles
 init_scripts
+init_helm_plugins
