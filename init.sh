@@ -99,11 +99,9 @@ init_scripts() {
 }
 
 init_helm_plugins() {
-
   if command -v helm >/dev/null 2>&1
   then
-    helm plugin install https://github.com/databus23/helm-diff --verify=false &>/dev/null
-    # helm plugin install https://github.com/dadav/helm-schema --verify=false &>/dev/null
+    source "${HOME}/scripts/pkg/sarinstall_helm_plugins.sh"
   else
     echo "warn: skipping helm plugins, helm could not be found" >&2
   fi
