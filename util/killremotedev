@@ -6,8 +6,8 @@ pgrep -la rider
 pgrep -la pycharm
 pgrep -la jetbrains
 
-pkill code
-pkill goland
-pkill rider
-pkill pycharm
-pkill jetbrains
+pkill -9 code
+pkill -9 goland
+pkill -9 rider
+pkill -9 pycharm
+pkill -9 jetbrains
