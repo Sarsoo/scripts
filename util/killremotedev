@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+pgrep -la code
+pgrep -la goland
+pgrep -la rider
+pgrep -la pycharm
+pgrep -la jetbrains
+
+pkill code
+pkill goland
+pkill rider
+pkill pycharm
+pkill jetbrains
