@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+subcommand="${1}"
+shift
+
+vja "${subcommand}" -v --custom-format=tasklist_long "$@"

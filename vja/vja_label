@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+ids=$(vja_id ls --title="${1}")
+echo "${ids[@]}" | xargs -I {} vja edit {} --force-create --label ${2}
+
+vja_v ls --title="${1}"

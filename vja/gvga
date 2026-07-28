@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+vja ls -v --custom-format=tasklist_long2 --title="$@"

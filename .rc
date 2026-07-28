@@ -20,6 +20,10 @@ if command -v zfs >/dev/null 2>&1; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/zfs"
 fi
 
+if command -v vja >/dev/null 2>&1; then
+    export PATH="$PATH:${SAR_SCRIPT_ROOT}/vja"
+fi
+
 if [[ "${machine}" == "Mac" ]]; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/mac"
 fi
