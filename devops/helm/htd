@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+lhs_dir=""
+rhs_dir="$(pwd)"
+rhs_output_dir=""
+positionals=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -d|--dir)
+            rhs_dir="$2"
+            shift 2
+            ;;
+        -o|--output-dir)
+            rhs_output_dir="$2"
+            shift 2
+            ;;
+        -b|--base)
+            lhs_dir="$2"
+            shift 2
+            ;;
+        *)
+            positionals+=("$1")
+            shift
+            ;;
+    esac
+done
+
+if [[ -z "${lhs_dir}" ]]; then
+    echo "err: --base/-b is required to diff against" >&2
+    exit 1;
+fi
+
+rhs_output_dir="${rhs_output_dir:-${rhs_dir}/templated}"
+
+ht \
+    --output-dir "${rhs_output_dir}" \
+    --chart "${rhs_dir}" \
+    "${positionals[@]}"  >/dev/null
+
+if [[ $? != 0 ]]; then
+    echo "err: failed to template helm" >&2
+    exit 1
+fi
+
+[[ -t 1 ]] && output_colour='always' || output_colour='never'
+
+diff_output=$(diff \
+    --recursive \
+    -u \
+    --suppress-common-lines \
+    --ignore-file-name-case \
+    --color="${output_colour}" \
+    "${lhs_dir}" "${rhs_output_dir}")
+
+if [[ $? == 2 ]]; then
+    echo "err: diff failed" >&2
+    exit 1
+fi
+
+if [[ -t 1 ]]; then
+  echo "${diff_output}" | ${PAGER:-less -R}
+else
+  echo "${diff_output}"
+fi

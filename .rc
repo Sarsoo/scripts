@@ -24,6 +24,10 @@ if command -v vja >/dev/null 2>&1; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/vja"
 fi
 
+if command -v helm >/dev/null 2>&1; then
+    export PATH="$PATH:${SAR_SCRIPT_ROOT}/devops/helm"
+fi
+
 if [[ "${machine}" == "Mac" ]]; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/mac"
 fi

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+chart_dir="$(pwd)"
+output_dir="$(pwd)/templated"
+positionals=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -c|--chart)
+            chart_dir="$2"
+            shift 2
+            ;;
+        -o|--output-dir)
+            output_dir="$2"
+            shift 2
+            ;;
+        *)
+            positionals+=("$1")
+            shift
+            ;;
+    esac
+done
+
+[[ -d "${output_dir}" ]] && rm -rf "${output_dir}"
+helm template temp-temp "${chart_dir}" "${positionals[@]}" --output-dir "${output_dir}"
+helm_rc=$?
+exit $helm_rc
