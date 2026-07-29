@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+if ! command -v jq >/dev/null; then
+  echo "err: failed to find jq install" >&2
+  exit 1
+fi
+
+job_output=$(kubectl get job "$@" -o json)
+if [[ $? != 0 ]]; then
+  echo "err: failed to get job"
+  exit 1
+fi
+job_output=$(echo "$job_output" | jq --compact-output)
+
+function restart_kjob() {
+  local job="$1"
+
+  local namespace=$(echo "$job" | jq '.metadata.namespace' --raw-output)
+  local name=$(echo "$job" | jq '.metadata.name' --raw-output)
+
+  read -p "re-run '${namespace}::${name}'? "
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    echo "re-running '${namespace}::${name}'..."
+
+    echo "$1" | \
+        jq 'del(.spec.selector)' | \
+        jq 'del(.spec.template.metadata.labels)' | \
+        jq 'del(.status)' | \
+        jq 'del(.metadata.resourceVersion, .metadata.uid, .metadata.creationTimestamp)' | \
+        kubectl replace --force -f -
+  else
+    echo "skipping '${namespace}::${name}'"
+  fi
+}
+
+object_kind=$(echo "$job_output" | jq '.kind' --raw-output)
+if [[ "$object_kind" == "List" ]]; then
+  while IFS= read -u3 -r -d $'\0' job; do
+
+    restart_kjob "$job"
+
+  done 3< <(echo "$job_output" | jq --raw-output0 --compact-output '.items[]')
+elif [[ "$object_kind" == "Job" ]]; then
+  restart_kjob "$job_output"
+else
+  echo "err: unknown object kind '$object_kind'" >&2
+  exit 1
+fi

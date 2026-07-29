@@ -28,6 +28,10 @@ if command -v helm >/dev/null 2>&1; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/devops/helm"
 fi
 
+if command -v kubectl >/dev/null 2>&1; then
+    export PATH="$PATH:${SAR_SCRIPT_ROOT}/devops/k8s"
+fi
+
 if [[ "${machine}" == "Mac" ]]; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/mac"
 fi
