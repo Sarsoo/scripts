@@ -36,7 +36,7 @@ fi
 
 git clone --bare "${repo}" "${name}.git"
 
-pushd
+pushd "${name}.git"
 git config --local --add remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 git fetch
 popd
