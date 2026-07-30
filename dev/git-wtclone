@@ -22,8 +22,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-repo=${repo:-${positionals[0}}
-name=${name:-${positionals[1}}
+repo=${repo:-${positionals[0]}}
+name=${name:-${positionals[1]}}
 
 if [[ -z "${repo}" ]]; then
   echo "err: repo required (-r/--repo)" >&2
