@@ -22,17 +22,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-repo=${repo:-${positionals[0]}}
-name=${name:-${positionals[1]}}
-
-if [[ -z "${repo}" ]]; then
-  echo "err: repo required (-r/--repo)" >&2
-  exit 1
-fi
-if [[ -z "${name}" ]]; then
-  echo "err: name required (-n/--name)" >&2
-  exit 1
-fi
+: "${repo:=${positionals[0]?'err: repo required (-r/--repo)'}}" "${name:=${positionals[1]?'err: name required (-n/--name)'}}"
 
 git clone --bare "${repo}" "${name}.git"
 

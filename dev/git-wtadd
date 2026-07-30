@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# set -euo pipefail
+
+name=""
+branch=""
+positionals=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -n|--name)
+            name="$2"
+            shift 2
+            ;;
+        -b|--branch)
+            branch="$2"
+            shift 2
+            ;;
+        *)
+            positionals+=("$1")
+            shift
+            ;;
+    esac
+done
+
+: "${name:=${positionals[0]:?'err: name required (-n/--name)'}}" "${branch:=${positionals[1]:?'err: branch required (-b/--branch)'}}"
+
+if [[ -d "./.git" ]]; then
+  export GIT_DIR='./.git'
+else
+
+  git_dirs=(./*.git)
+  if [[ ${#git_dirs[@]} == 1 ]]; then
+
+    export GIT_DIR="${git_dirs[0]}"
+  fi
+fi
+
+git worktree add --track "${name}" "${branch}"

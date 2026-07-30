@@ -16,8 +16,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-[[ -z "${file}" ]] && exit 1;
-[[ -z "${sed}" ]] && exit 1;
+: "${file:?}" "${sed:?}"
 
 case "$(uname -s)" in
     Darwin*)    machine=Mac;;

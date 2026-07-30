@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
 
-pgrep -la code
-pgrep -la goland
-pgrep -la embeddings
-pgrep -la rider
-pgrep -la pycharm
-pgrep -la jetbrains
-
-pkill -9 code
-pkill -9 goland
-pkill -9 embeddings
-pkill -9 rider
-pkill -9 pycharm
-pkill -9 jetbrains
+cmds=(code goland embeddings rider pycharm jetbrains)
+for i in "${cmds[@]}"; do
+  pgrep -la $i
+  pkill -9 $i
+done

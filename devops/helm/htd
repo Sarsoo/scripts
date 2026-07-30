@@ -27,12 +27,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ -z "${lhs_dir}" ]]; then
-    echo "err: --base/-b is required to diff against" >&2
-    exit 1;
-fi
-
-rhs_output_dir="${rhs_output_dir:-${rhs_dir}/templated}"
+: "${lhs_dir:?'err: --base/-b is required to diff against'}" "${rhs_output_dir:=${rhs_dir}/templated}"
 
 ht \
     --output-dir "${rhs_output_dir}" \
