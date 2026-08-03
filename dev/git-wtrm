@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 name=""
-branch=""
-args=()
 positionals=()
 
 while [[ $# -gt 0 ]]; do
@@ -11,14 +9,6 @@ while [[ $# -gt 0 ]]; do
             name="$2"
             shift 2
             ;;
-        -r|--branch)
-            branch="$2"
-            shift 2
-            ;;
-        -b)
-            args+=('-b')
-            shift 1
-            ;;
         *)
             positionals+=("$1")
             shift
@@ -26,7 +16,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-: "${name:=${positionals[0]:?'err: name required (-n/--name)'}}" "${branch:=${positionals[1]:?'err: branch required (-b/--branch)'}}"
+: "${name:=${positionals[0]:?'err: name required (-n/--name)'}}"
 
 if [[ -d "./.git" ]]; then
   export GIT_DIR='./.git'
@@ -39,9 +29,4 @@ else
   fi
 fi
 
-git worktree add \
-  --track \
-  --guess-remote \
-  --relative-paths \
-  "${args[@]}" \
-  "${name}" "${branch}"
+git worktree remove "${name}"

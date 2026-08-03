@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+if [[ -d "./.git" ]]; then
+  export GIT_DIR='./.git'
+else
+
+  git_dirs=(./*.git)
+  if [[ ${#git_dirs[@]} == 1 ]]; then
+
+    export GIT_DIR="${git_dirs[0]}"
+  fi
+fi
+
+git worktree list
