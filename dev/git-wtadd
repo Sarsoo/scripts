@@ -26,22 +26,9 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-: "${name:=${positionals[0]:?'err: name required (-n/--name)'}}" "${branch:=${positionals[1]:?'err: branch required (-b/--branch)'}}"
-
-if [[ -d "./.git" ]]; then
-  export GIT_DIR='./.git'
-else
-
-  git_dirs=(./*.git)
-  if [[ ${#git_dirs[@]} == 1 ]]; then
-
-    export GIT_DIR="${git_dirs[0]}"
-  fi
-fi
+: "${name:=${positionals[0]:?'err: name required (-n/--name)'}}" "${branch:=${positionals[1]:=${name:?'err: branch required (-b/--branch)'}}}"
 
 git worktree add \
-  --track \
-  --guess-remote \
   --relative-paths \
   "${args[@]}" \
   "${name}" "${branch}"

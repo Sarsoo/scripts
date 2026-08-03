@@ -21,11 +21,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-: "${repo:=${positionals[0]?'err: repo required (-r/--repo)'}}" "${name:=${positionals[1]?'err: name required (-n/--name)'}}"
+: "${repo:=${positionals[0]?'err: repo required (-r/--repo)'}}" "${name:=${positionals[1]:=$(basename $(pwd))}}"
 
-git clone --bare "${repo}" "${name}.git"
+git clone "${repo}" "${name}.git"
+echo "gitdir: ./${name}.git/.git" > .git
 
-pushd "${name}.git"
-git config --local --add remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-git fetch
-popd
+pushd "${name}.git" >/dev/null
+git checkout $(git commit-tree $(git hash-object -t tree /dev/null) < /dev/null) &>/dev/null
+popd >/dev/null
