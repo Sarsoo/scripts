@@ -30,5 +30,6 @@ done
 
 git worktree add \
   --relative-paths \
+  "${name}" \
   "${args[@]}" \
-  "${name}" "${branch}"
+  "${branch}"
