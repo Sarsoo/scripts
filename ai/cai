@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+key=$(cat ~/.local/share/opencode/auth.json | jq '."openai".key' --raw-output)
+
+curl \
+  --silent \
+  --header "Authorization: Bearer $key" \
+  "https://bifrost.lab.sarsoo.xyz/v1/$1" \
+  -k \
+| jq -C \
+| less -R
