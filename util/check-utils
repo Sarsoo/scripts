@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+function check-installed() {
+  local name="$1"
+
+  if command -v "$name" &>/dev/null; then
+    echo "$name ✅$(whereis $name | cut -d':' -f2)"
+  else
+    echo "$name ❌"
+  fi
+}
+
+check-installed 'curl'
+check-installed 'wget'
+check-installed 'git'
+check-installed 'htop'
+check-installed 'vim'
+check-installed 'nvim'
+
+echo ''
+echo '>> SHELL'
+check-installed 'yazi'
+check-installed 'ranger'
+check-installed 'delta'
+check-installed 'tmux'
+check-installed 'rg'
+check-installed 'starship'
+check-installed 'vja'
+
+echo ''
+echo '>> DEV'
+check-installed 'uv'
+check-installed 'npm'
+check-installed 'node'
+
+echo ''
+echo '>> NET'
+check-installed 'openssl'
+check-installed 'dig'
+check-installed 'mtr'
+check-installed 'trip'
+check-installed 'termshark'
+
+echo ''
+echo '>> DEVOPS'
+check-installed 'kubectl'
+check-installed 'helm'
+check-installed 'k9s'
+check-installed 'flux9s'
+check-installed 'aws'
+
+echo ''
+echo '>> AI'
+check-installed 'pi'
+check-installed 'opencode'
+check-installed 'herdr'
+
+echo ''
+echo '>> INFRA'
+check-installed 'zfs'
+check-installed 'zpool'
