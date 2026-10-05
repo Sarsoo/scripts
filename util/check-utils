@@ -26,6 +26,8 @@ check-installed 'tmux'
 check-installed 'rg'
 check-installed 'starship'
 check-installed 'vja'
+check-installed 'gitui'
+check-installed 'lazygit'
 
 echo ''
 echo '>> DEV'
