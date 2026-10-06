@@ -37,8 +37,7 @@ export PATH
 # Searching SCRIPT_DIR, rather than using `command -v`, prevents PATH shadowing
 # and makes dispatch and generated help refer to the same command inventory.
 command_path() {
-    # find "${SCRIPT_DIR}" -type f -name "$1" -executable -print -quit
-    find "${SCRIPT_DIR}" -type f -name "$1" -print -quit
+    find "${SCRIPT_DIR}" -type f -name "$1" -executable -print -quit
 }
 
 # A command is a leaf when an executable file with its exact encoded name exists.
@@ -50,8 +49,7 @@ command_exists() {
 # command begins with its encoded prefix. For example, so-aws is an umbrella
 # because so-cai exists.
 has_descendants() {
-    # find "${SCRIPT_DIR}" -type f -name "$1-*" -executable -print -quit | grep -q .
-    find "${SCRIPT_DIR}" -type f -name "$1-*" -print -quit | grep -q .
+    find "${SCRIPT_DIR}" -type f -name "$1-*" -executable -print -quit | grep -q .
 }
 
 # Read a single value from a command's lightweight metadata header:
@@ -117,7 +115,7 @@ print_help() {
         display_name="${display_name/-/ }"
         printf '  %-28s %s\n' "$display_name" "$summary"
         found=1
-    done < <(find "${SCRIPT_DIR}" -type f -name "${prog}-*" -print0 | sort -z)
+    done < <(find "${SCRIPT_DIR}" -type f -name "${prog}-*" -executable -print0 | sort -z)
 
     if [[ "$found" == 0 ]]; then
         printf '  (no public commands available)\n'
