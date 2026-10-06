@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# sarsoo: summary="Inspect an image from a registry"
+# sarsoo: visibility="public"
+set -o pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: so ctr inspect [options] [positionals]
+
+Inspect the manifest for a container image
+
+Options:
+  -i, --image REF       Image reference (e.g: docker://example:latest)
+  -h, --help            Show this help
+EOF
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+  esac
+done
+
+if ! command -v skopeo >/dev/null; then
+  echo "failed to find skopeo install" >&2
+  exit 1
+fi
+
+if ! command -v jq >/dev/null; then
+  echo "failed to find jq install" >&2
+  exit 1
+fi
+
+image=""
+positionals=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -i|--image)
+            image="$2"
+            shift 2
+            ;;
+        *)
+            positionals+=("$1")
+            shift
+            ;;
+    esac
+done
+
+: "${image:=${positionals[0]:?'err: image required (-i/--image)'}}"
+
+skopeo inspect "${image}" | jq

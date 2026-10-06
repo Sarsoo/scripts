@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# sarsoo: summary="List available images in a registry"
+# sarsoo: visibility="public"
+set -o pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: so ctr ls [options] [positionals]
+
+List the available tags for an image
+
+Options:
+  -r, --registry REF    Registry location (e.g: docker://test)
+  -h, --help            Show this help
+EOF
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+  esac
+done
+
+if ! command -v skopeo >/dev/null; then
+  echo "failed to find skopeo install" >&2
+  exit 1
+fi
+
+if ! command -v jq >/dev/null; then
+  echo "failed to find jq install" >&2
+  exit 1
+fi
+
+registry=""
+positionals=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -r|--registry)
+            registry="$2"
+            shift 2
+            ;;
+        *)
+            positionals+=("$1")
+            shift
+            ;;
+    esac
+done
+
+: "${registry:=${positionals[0]:?'err: registry required (-r/--registry)'}}"
+
+results=$(skopeo list-tags "${registry}")
+if [[ $? -ne 0 ]]; then
+  echo "err: reading from registry" >&2
+  exit 1
+fi
+
+echo "${results}" | jq '.Tags[]' --raw-output
