@@ -30,14 +30,14 @@ SCRIPT_DIR="${BIN_DIR}"
 # after this dispatcher replaces itself with the final leaf via exec.
 while IFS= read -r -d '' directory; do
     PATH="${PATH}:${directory}"
-done < <(find "${SCRIPT_DIR}" -type d -print0 | sort -z)
+done < <(find "${SCRIPT_DIR}" -type d -print0 2>/dev/null | sort -z)
 export PATH
 
 # Print the first executable command file with the supplied encoded name.
 # Searching SCRIPT_DIR, rather than using `command -v`, prevents PATH shadowing
 # and makes dispatch and generated help refer to the same command inventory.
 command_path() {
-    find "${SCRIPT_DIR}" -type f -name "$1" -executable -print -quit
+    find "${SCRIPT_DIR}" -type f -name "$1" -executable -print -quit 2>/dev/null
 }
 
 # A command is a leaf when an executable file with its exact encoded name exists.
@@ -49,7 +49,7 @@ command_exists() {
 # command begins with its encoded prefix. For example, so-aws is an umbrella
 # because so-cai exists.
 has_descendants() {
-    find "${SCRIPT_DIR}" -type f -name "$1-*" -executable -print -quit | grep -q .
+    find "${SCRIPT_DIR}" -type f -name "$1-*" -executable -print -quit 2>/dev/null | grep -q .
 }
 
 # Read a single value from a command's lightweight metadata header:
@@ -115,7 +115,7 @@ print_help() {
         display_name="${display_name/-/ }"
         printf '  %-28s %s\n' "$display_name" "$summary"
         found=1
-    done < <(find "${SCRIPT_DIR}" -type f -name "${prog}-*" -executable -print0 | sort -z)
+    done < <(find "${SCRIPT_DIR}" -type f -name "${prog}-*" -executable -print0 2>/dev/null | sort -z)
 
     if [[ "$found" == 0 ]]; then
         printf '  (no public commands available)\n'
