@@ -2,6 +2,28 @@
 # sarsoo: summary="Sarsoo Network Debugging"
 # sarsoo: visibility="public"
 
+usage() {
+  cat <<'EOF'
+Usage: so snd [options] [positionals]
+
+Broad network debugging workspace in tmux
+
+Options:
+  -p, --protocol PROTO  (icmp/tcp/udp)
+  -h, --host HOSTNAME   IP/hostname to target
+  -h, --help            Show this help
+EOF
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    --help)
+      usage
+      exit 0
+      ;;
+  esac
+done
+
 tmux_session="snd_$(date +%s)"
 protocol=""
 host=""
@@ -25,14 +47,16 @@ while [[ $# -gt 0 ]]; do
 done
 
 if (( ${#positionals[@]} > 1 )); then
-  echo "Unknown arguments" >&2
+  echo "err: Unknown arguments" >&2
+  usage
   exit 1
 fi
 
 host="${host:-${positionals[0]}}"
 
 if [[ -z "${host}" ]]; then
-  echo "No host provided" >&2
+  echo "err: No host provided" >&2
+  usage
   exit 1
 fi
 
@@ -72,6 +96,8 @@ tmux send-keys -t "${tmux_session}:${first_window}.2" "command dig ${host} | tee
 tmux send-keys -t "${tmux_session}:${first_window}.3" "command ip route get ${host} | tee ${output_path}/route.txt" Enter
 
 
-
-
-tmux attach -t "${tmux_session}"
+if [[ -z "${TMUX}" ]]; then
+  tmux attach -t "${tmux_session}"
+else
+  echo "snd tmux session [${tmux_session}] started..."
+fi

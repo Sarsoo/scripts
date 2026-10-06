@@ -137,7 +137,7 @@ fi
 cmd="$prog"
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -h|--help)
+        --help)
             # A resolved leaf owns detailed option help. Otherwise this is root
             # or umbrella help and is generated from public command metadata.
             if [[ "$cmd" != "$prog" ]] && command_exists "$cmd"; then

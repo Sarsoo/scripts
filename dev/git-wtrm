@@ -1,21 +1,8 @@
 #!/usr/bin/env bash
 
-name=""
-positionals=()
+if [[ $# -ne 1 ]]; then
+  echo "err: no name provided" >&2
+  exit 1
+fi
 
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -n|--name)
-            name="$2"
-            shift 2
-            ;;
-        *)
-            positionals+=("$1")
-            shift
-            ;;
-    esac
-done
-
-: "${name:=${positionals[0]:?'err: name required (-n/--name)'}}"
-
-git worktree remove "${name}"
+git worktree remove "$@"

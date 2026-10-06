@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+git branch -a --contains "${1}"
