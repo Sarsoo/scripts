@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+while IFS= read -r directory; do
+  if [[ ! $directory =~ .*\.git ]]; then
+    echo "${directory}"
+
+    if pushd "${directory}" >/dev/null; then
+      git pull
+      popd >/dev/null
+    fi
+  fi
+done < <(git worktree list --porcelain | grep 'worktree' | cut -d ' ' -f 2)
