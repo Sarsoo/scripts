@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # sarsoo: summary="Install kat"
 # sarsoo: visibility="public"
+set -euo pipefail
 
 pushd ~/.local/bin
 curl -s https://api.github.com/repos/macropower/kat/releases/latest | \

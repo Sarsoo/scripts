@@ -1,5 +1,30 @@
 #!/usr/bin/env bash
+# sarsoo: summary="Diff helm outputs"
+# sarsoo: visibility="public"
 set -uo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: so htd [options] [positionals]
+
+Diff an existing helm templated output with the output from a working directory
+
+Options:
+  -b, --base DIR        Directory of existing templates to diff against
+  -d, --dir DIR         Chart directory (default: .)
+  -o, --output-dir DIR  Directory to output --dir templates to (default: ./templated)
+  -h, --help            Show this help
+EOF
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+  esac
+done
 
 lhs_dir=""
 rhs_dir="$(pwd)"
@@ -29,7 +54,7 @@ done
 
 : "${lhs_dir:?'err: --base/-b is required to diff against'}" "${rhs_output_dir:=${rhs_dir}/templated}"
 
-ht \
+so ht \
     --output-dir "${rhs_output_dir}" \
     --chart "${rhs_dir}" \
     "${positionals[@]}"  >/dev/null

@@ -3,6 +3,7 @@
 # sarsoo: visibility="public"
 #
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+set -euo pipefail
 
 (
   set -x; cd "$(mktemp -d)" &&

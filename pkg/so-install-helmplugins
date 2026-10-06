@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # sarsoo: summary="Install helm plugins"
 # sarsoo: visibility="public"
+set -euo pipefail
 
 helm plugin install https://github.com/databus23/helm-diff --verify=false &>/dev/null
 # helm plugin install https://github.com/dadav/helm-schema --verify=false &>/dev/null

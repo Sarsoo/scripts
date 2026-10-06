@@ -4,9 +4,12 @@
 # Commands are executable files beneath script/ whose names encode their command
 # path: `so-cai` implements `so cai`. This dispatcher resolves
 # as many command tokens as possible, then execs the resolved leaf with the
-# remaining arguments. It also treats command prefixes with descendants as
-# umbrellas, so `so aws` can render generated help without an executable
-# `so-aws` script.
+# remaining arguments. Resolution is greedy with a fallback: once a token no
+# longer extends the path and the current command is an executable leaf, that
+# leaf is exec'd with all remaining tokens as its arguments. A literal `--`
+# stops path resolution early and forces every following token through as an
+# argument. It also treats command prefixes with descendants as umbrellas, so
+# `so aws` can render generated help without an executable `so-aws` script.
 #
 # Public command discovery is deliberately filesystem- and metadata-based:
 # only executable command files under this installation's script/ directory
@@ -144,12 +147,22 @@ while [[ $# -gt 0 ]]; do
             print_help "$cmd"
             exit 0
             ;;
+        --)
+            # Explicit end of command-path resolution: everything after this
+            # token is passed through to the resolved leaf as an argument.
+            shift
+            break
+            ;;
     esac
 
     candidate="${cmd}-$1"
     if command_exists "$candidate" || has_descendants "$candidate"; then
         cmd="$candidate"
         shift
+    elif [[ "$cmd" != "$prog" ]] && command_exists "$cmd"; then
+        # The current command is a leaf and this token does not extend it, so
+        # stop resolving and let the leaf receive the remaining arguments.
+        break
     else
         printf "err: unknown command '%s'\n" "$1" >&2
         printf "Run '%s --help' for available commands.\n" "$prog" >&2
@@ -157,11 +170,20 @@ while [[ $# -gt 0 ]]; do
     fi
 done
 
-# All tokens were consumed. Exec a leaf (rather than spawning it) to preserve
-# its exit status and signal behaviour. A prefix without a leaf is an umbrella.
-if command_exists "$cmd"; then
+# Exec a leaf (rather than spawning it) to preserve its exit status and signal
+# behaviour, forwarding any arguments left by the fallback or `--` boundary.
+# The root program name is excluded: `$prog` is this dispatcher file, not a leaf.
+if [[ "$cmd" != "$prog" ]] && command_exists "$cmd"; then
     export SARSOO_LIB_DIR="${BIN_DIR}/lib"
-    exec "$(command_path "$cmd")"
+    exec "$(command_path "$cmd")" "$@"
+fi
+
+# No executable leaf was resolved. Leftover arguments mean an umbrella (or the
+# root) was asked to consume arguments it cannot receive.
+if [[ $# -gt 0 ]]; then
+    printf "err: unknown command '%s'\n" "$1" >&2
+    printf "Run '%s --help' for available commands.\n" "$prog" >&2
+    exit 1
 fi
 
 print_help "$cmd"
