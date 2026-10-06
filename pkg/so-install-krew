@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-
+# sarsoo: summary="Install Krew and plugins"
+# sarsoo: visibility="public"
+#
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/
 
 (
@@ -11,3 +13,8 @@
   tar zxvf "${KREW}.tar.gz" &&
   ./"${KREW}" install krew
 )
+
+# https://github.com/keisku/kubectl-explore
+kubectl krew install explore
+kubectl krew install popeye
+kubectl krew install view-allocations

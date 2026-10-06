@@ -11,12 +11,10 @@ esac
 
 SAR_SCRIPT_ROOT=${SAR_SCRIPT_ROOT:-"$HOME/scripts"}
 
-export PATH="$PATH:${SAR_SCRIPT_ROOT}/ai"
+export PATH="$PATH:${SAR_SCRIPT_ROOT}"
+
 export PATH="$PATH:${SAR_SCRIPT_ROOT}/dev"
 export PATH="$PATH:${SAR_SCRIPT_ROOT}/devops"
-export PATH="$PATH:${SAR_SCRIPT_ROOT}/net"
-export PATH="$PATH:${SAR_SCRIPT_ROOT}/pkg"
-export PATH="$PATH:${SAR_SCRIPT_ROOT}/util"
 
 if command -v zfs >/dev/null 2>&1; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/zfs"
@@ -24,10 +22,6 @@ fi
 
 if command -v vja >/dev/null 2>&1; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/vja"
-fi
-
-if command -v helm >/dev/null 2>&1; then
-    export PATH="$PATH:${SAR_SCRIPT_ROOT}/devops/helm"
 fi
 
 if command -v kubectl >/dev/null 2>&1; then

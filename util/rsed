@@ -23,7 +23,7 @@ case "$(uname -s)" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
-if [[ "${machine}" == "Mac" ]] then;
+if [[ "${machine}" == "Mac" ]]; then
   find . -type f -name "${file}" -print0 | xargs -0 sed -i '' "${sed}"
 else
   find . -type f -name "${file}" -print0 | xargs -0 sed -i "${sed}"

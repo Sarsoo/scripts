@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# sarsoo: summary="Sarsoo Network Debugging"
+# sarsoo: visibility="public"
 
 tmux_session="snd_$(date +%s)"
 protocol=""
@@ -42,9 +44,23 @@ fi
 output_path="${HOME}/snd/$(date +%Y/%m/%d/%H%M%S)_${host}"
 mkdir -p "${output_path}"
 
-tmux new -d -s "${tmux_session}"
+# -d = detached
+# -s = name
+# -c = start dir
+# -n = window name
+# -P = print session info ‘#{session_name}:’
+tmux new-session -d -s "${tmux_session}"
+
+# -a = all
+# -f = filter
+# -F = format
 first_window=$(tmux list-windows -t "${tmux_session}" | cut -d ':' -f1)
+# -a = all panes on server
+# -s = target is session
 first_pane=$(tmux list-panes -t "${tmux_session}:${first_window}" | cut -d ':' -f1)
+# -v = vertical
+# -h = horizontal
+# -t = target pane
 tmux split-window -v -t "${tmux_session}:${first_window}"
 tmux split-window -h -t "${tmux_session}:${first_window}.2"
 

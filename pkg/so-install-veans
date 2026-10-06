@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# sarsoo: summary="Install veans"
+# sarsoo: visibility="public"
+
 set -euo pipefail
 
 version="v2.4.0"

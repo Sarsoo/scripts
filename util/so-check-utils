@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# sarsoo: summary="Check for frequently used util tools"
+# sarsoo: visibility="public"
 
 function check-installed() {
   local name="$1"
@@ -16,6 +18,7 @@ check-installed 'git'
 check-installed 'htop'
 check-installed 'vim'
 check-installed 'nvim'
+check-installed 'fzf'
 
 echo ''
 echo '>> SHELL'

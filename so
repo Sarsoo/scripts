@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+# Sarsoo's root porcelain dispatcher.
+#
+# Commands are executable files beneath script/ whose names encode their command
+# path: `so-cai` implements `so cai`. This dispatcher resolves
+# as many command tokens as possible, then execs the resolved leaf with the
+# remaining arguments. It also treats command prefixes with descendants as
+# umbrellas, so `so aws` can render generated help without an executable
+# `so-aws` script.
+#
+# Public command discovery is deliberately filesystem- and metadata-based:
+# only executable command files under this installation's script/ directory
+# are considered. This avoids listing unrelated executables from the user's
+# PATH and lets scripts retain their descriptions beside their implementation.
+set -uo pipefail
+
+# Resolve the real location of this script, following symlinks. BIN_DIR is the
+# installation root; it remains correct when so
+# itself is invoked through the installed symlink described in the README.
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+BIN_DIR="$(dirname "$SELF")"
+prog="${SARSOO_COMMAND_PREFIX:-so}"
+SCRIPT_DIR="${BIN_DIR}"
+
+# Add every command directory to PATH. Leaf scripts call internal helpers by
+# executable name (for example so-aws-pick-rds), so they must be discoverable
+# after this dispatcher replaces itself with the final leaf via exec.
+while IFS= read -r -d '' directory; do
+    PATH="${PATH}:${directory}"
+done < <(find "${SCRIPT_DIR}" -type d -print0 | sort -z)
+export PATH
+
+# Print the first executable command file with the supplied encoded name.
+# Searching SCRIPT_DIR, rather than using `command -v`, prevents PATH shadowing
+# and makes dispatch and generated help refer to the same command inventory.
+command_path() {
+    # find "${SCRIPT_DIR}" -type f -name "$1" -executable -print -quit
+    find "${SCRIPT_DIR}" -type f -name "$1" -print -quit
+}
+
+# A command is a leaf when an executable file with its exact encoded name exists.
+command_exists() {
+    [[ -n "$(command_path "$1")" ]]
+}
+
+# An umbrella need not be a file itself: it exists when at least one executable
+# command begins with its encoded prefix. For example, so-aws is an umbrella
+# because so-cai exists.
+has_descendants() {
+    # find "${SCRIPT_DIR}" -type f -name "$1-*" -executable -print -quit | grep -q .
+    find "${SCRIPT_DIR}" -type f -name "$1-*" -print -quit | grep -q .
+}
+
+# Read a single value from a command's lightweight metadata header:
+#   # sarsoo: summary="..."
+#   # sarsoo: visibility="public"|"internal"
+# Metadata is parsed rather than sourced or executed, so asking for help cannot
+# trigger dependency checks, AWS calls, or other leaf-script side effects.
+command_metadata() {
+    local path="$1"
+    local field="$2"
+
+    awk -v field="$field" '
+        $0 ~ "^# sarsoo: " field "=\"" {
+            value = $0
+            sub("^# sarsoo: " field "=\"", "", value)
+            sub("\"$", "", value)
+            print value
+            exit
+        }
+    ' "$path"
+}
+
+# Render root or umbrella help for an encoded prefix. Only public descendants
+# are listed; internal helper scripts remain callable directly but are hidden
+# from the normal discovery surface. Command names are converted from the
+# encoded dash form to their CLI form by replacing only the root separator:
+# `so-cai-connect` becomes `cai-connect`.
+print_help() {
+    local prefix="$1"
+    local usage_path
+    local command_name
+    local display_name
+    local summary
+    local visibility
+    local found=0
+
+    # Convert the encoded prefix to a user-facing usage path.
+    if [[ "$prefix" == "$prog" ]]; then
+        usage_path="$prog"
+    else
+        usage_path="${prefix#"${prog}-"}"
+        usage_path="${usage_path//-/ }"
+        usage_path="$prog $usage_path"
+    fi
+
+    printf 'Usage: %s <command> [args...]\n' "$usage_path"
+    printf '\nAvailable commands:\n'
+
+    # NUL delimiters make this safe for unusual filesystem names. The project
+    # convention does not require them, but find -print0 avoids line-splitting.
+    while IFS= read -r -d '' path; do
+        command_name="${path##*/}"
+        if [[ "$prefix" != "$prog" && "$command_name" != "$prefix"-* ]]; then
+            continue
+        fi
+
+        visibility="$(command_metadata "$path" visibility)"
+        [[ "$visibility" == "public" ]] || continue
+
+        summary="$(command_metadata "$path" summary)"
+        [[ -n "$summary" ]] || summary='No description available.'
+        display_name="${command_name#"${prog}-"}"
+        display_name="${display_name/-/ }"
+        printf '  %-28s %s\n' "$display_name" "$summary"
+        found=1
+    done < <(find "${SCRIPT_DIR}" -type f -name "${prog}-*" -print0 | sort -z)
+
+    if [[ "$found" == 0 ]]; then
+        printf '  (no public commands available)\n'
+    fi
+
+    printf '\nRun %s <command> --help for command-specific help.\n' "$usage_path"
+}
+
+# No command is a successful discovery request, not an argument error.
+if [[ $# -eq 0 ]]; then
+    print_help "$prog"
+    exit 0
+fi
+
+# Resolve the porcelain path greedily. A token may extend an executable leaf
+# or an umbrella prefix; the latter permits `so aws` and `so aws --help`.
+cmd="$prog"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            # A resolved leaf owns detailed option help. Otherwise this is root
+            # or umbrella help and is generated from public command metadata.
+            if [[ "$cmd" != "$prog" ]] && command_exists "$cmd"; then
+                export SARSOO_LIB_DIR="${BIN_DIR}/lib"
+                exec "$(command_path "$cmd")" --help
+            fi
+            print_help "$cmd"
+            exit 0
+            ;;
+    esac
+
+    candidate="${cmd}-$1"
+    if command_exists "$candidate" || has_descendants "$candidate"; then
+        cmd="$candidate"
+        shift
+    else
+        printf "err: unknown command '%s'\n" "$1" >&2
+        printf "Run '%s --help' for available commands.\n" "$prog" >&2
+        exit 1
+    fi
+done
+
+# All tokens were consumed. Exec a leaf (rather than spawning it) to preserve
+# its exit status and signal behaviour. A prefix without a leaf is an umbrella.
+if command_exists "$cmd"; then
+    export SARSOO_LIB_DIR="${BIN_DIR}/lib"
+    exec "$(command_path "$cmd")"
+fi
+
+print_help "$cmd"

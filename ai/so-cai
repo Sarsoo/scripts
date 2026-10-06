@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# sarsoo: summary="OpenAI curl at Bifrost"
+# sarsoo: visibility="public"
+
 set -uo pipefail
 
 key=$(cat ~/.local/share/opencode/auth.json | jq '."openai".key' --raw-output)

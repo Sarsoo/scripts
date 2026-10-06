@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# sarsoo: summary="Kill remote dev servers"
+# sarsoo: visibility="public"
 
 cmds=(code goland embeddings rider pycharm jetbrains)
 for i in "${cmds[@]}"; do

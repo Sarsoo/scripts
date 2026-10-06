@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# sarsoo: summary="Inspect a pem encoded certificate"
+# sarsoo: visibility="public"
 set -uo pipefail
 
 output=""
