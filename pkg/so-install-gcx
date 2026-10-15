@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# sarsoo: summary="Install Grafana GCX"
+# sarsoo: visibility="public"
+set -euo pipefail
+
+curl -fsSL https://raw.githubusercontent.com/grafana/gcx/main/scripts/install.sh | sh
