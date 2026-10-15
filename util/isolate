@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Skip re-isolating if already inside an isolated environment
+if [[ -n "${ISOLATE_ENV:-}" ]]; then
+	>&2 echo "warning: already isolated"
+	exec "$@"
+fi
+
+tiocsti_path="/proc/sys/dev/tty/legacy_tiocsti"
+if [ ! -f "$tiocsti_path" ] || [ "$(cat "$tiocsti_path")" != "0" ]; then
+	>&2 echo "warning: TIOCSTI not disabled"
+fi
+
+args=()
+
+args+=(
+	--dev-bind /dev /dev \
+	--proc /proc \
+	--tmpfs /tmp \
+	--tmpfs /run \
+ 	--setenv PROMPT_ENV_INDICATOR "isolated" \
+ 	--setenv ISOLATE_ENV "$(pwd)"
+)
+
+# READ-ONLY
+for p in \
+	/bin \
+	/usr \
+	/lib \
+	/lib64 \
+	/etc \
+	"$HOME/.config" \
+	"$HOME/.profile" \
+	"$HOME/.bashrc" \
+	"$HOME/.sarc" \
+	"$HOME/.local/bin" \
+	"$HOME/.ssh/config" \
+	"$HOME/.gitconfig" \
+	"$HOME/.ssh/known_hosts" \
+	; do
+	args+=(--ro-bind-try "$p" "$p")
+done
+
+# READ-WRITE
+for p in \
+  "$HOME/.pi" \
+  "$HOME/.config/herdr" \
+  "$HOME/.opencode" \
+  "$HOME/.config/opencode" \
+  "$HOME/.local/share/opencode" \
+  "$HOME/.local/state/opencode" \
+  "$HOME/.cache/opencode" \
+  "$HOME/.mcp" \
+  "$HOME/.agents" \
+  "$HOME/dotfiles" \
+	"$HOME/.dotnet" \
+	"$HOME/.npmrc" \
+	"$HOME/.npm" \
+	"$HOME/.aspnet" \
+	"$HOME/.local/share/NuGet" \
+	"$HOME/.nuget" \
+	"$HOME/.terraform.d" \
+	"$HOME/.terraformrc" \
+	"$(dirname $SSH_AUTH_SOCK)" \
+	"$XDG_RUNTIME_DIR/gnupg/S.gpg-agent" \
+	"$(pwd)"\
+	; do
+	args+=(--bind-try "$p" "$p")
+done
+
+# READ-WRITE
+for p in \
+  "HOME" \
+  "USER" \
+  "SSH_AUTH_SOCK" \
+	; do
+	args+=(--setenv "$p" "${!p}")
+done
+
+args+=(
+ 	--dir "$HOME/.gnupg" \
+ 	--chmod 0700 "$HOME/.gnupg" \
+  --unshare-pid --share-net \
+  --die-with-parent --new-session \
+  --chdir "$PWD"
+)
+
+# Source extra config (e.g. set by auto-isolate) to allow
+# project-specific additions to args
+if [[ -n "${ISOLATE_EXTRA_CONFIG:-}" && -f "$ISOLATE_EXTRA_CONFIG" ]]; then
+	source "$ISOLATE_EXTRA_CONFIG"
+	# Hide the config file inside the sandbox by overlaying /dev/null
+	args+=(--ro-bind /dev/null "$ISOLATE_EXTRA_CONFIG")
+fi
+
+exec bwrap \
+	"${args[@]}" \
+	"$@"
