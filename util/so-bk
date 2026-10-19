@@ -11,6 +11,11 @@
 # Or use the `bk` shell function (in ~/.sarc) to switch directly:
 #
 #   bk() { local d; d="$(so bk)" && [[ -n $d ]] && cd "$d"; }
+#
+# If the picked bookmark is the root of a git worktree tree (a `git-wtclone`
+# checkout: a <name>.git repository directory beside a .git file pointing at
+# it), a second picker lists that tree's worktrees and the chosen one is
+# printed. Cancelling that picker falls back to the tree root.
 
 set -uo pipefail
 
@@ -29,6 +34,11 @@ Entries may use a leading ~ (for \$HOME) and \$VAR / \${VAR} expansion.
 Examples:
   bk              change the current directory (via the ~/.sarc function)
   cd "\$(so bk)"   compose it yourself
+
+If a picked bookmark is the root of a git worktree tree (as created by
+ git-wtclone), a second fzf picker lists its worktrees; the selected worktree
+ path is printed instead of the root. Cancelling that second picker prints
+ the tree root.
 EOF
     exit 0
 fi
@@ -79,6 +89,49 @@ if [[ "${1:-}" == "--expand" ]]; then
     exit 0
 fi
 
+# A worktree tree root holds a <name>.git repository directory next to a .git
+# file that points at it. Ordinary worktrees have a .git file too, but no
+# sibling repo directory, so this is what tells the two apart.
+is_worktree_root() {
+    local dir="$1" candidate
+
+    [[ -d "$dir" && -f "$dir/.git" ]] || return 1
+    for candidate in "$dir"/*.git; do
+        [[ -d "$candidate" ]] || continue
+        [[ -e "$candidate/.git" || -f "$candidate/HEAD" ]] && return 0
+    done
+    return 1
+}
+
+# Second picker: list the worktrees of a tree rooted at $1 and print the
+# chosen path. Returns non-zero if there is nothing to pick or fzf is
+# cancelled; the caller then falls back to the tree root.
+pick_worktree() {
+    local dir="$1" selection
+
+    selection="$(
+        git -C "$dir" worktree list --porcelain 2>/dev/null \
+            | awk -v root="$dir" '
+                /^worktree / { path = substr($0, 10); next }
+                /^bare/      { path = ""; next }
+                /^$/ {
+                    if (path != "") print (path ~ /^\// ? path : root "/" path)
+                    path = ""
+                }
+                END {
+                    if (path != "") print (path ~ /^\// ? path : root "/" path)
+                }
+            ' \
+            | fzf --prompt='worktree> ' \
+                  --height='40%' \
+                  --reverse \
+                  --preview='d={}; git -C "$d" status --short --branch 2>/dev/null; ls -C --color=always "$d" 2>/dev/null | head -30'
+    )" || return 1
+
+    [[ -n "$selection" ]] || return 1
+    printf '%s\n' "$selection"
+}
+
 # Strip blank lines and full-line comments, keep the rest verbatim.
 selection="$(
     awk '!/^[[:space:]]*(#|$)/' "$bk_file" \
@@ -90,4 +143,11 @@ selection="$(
 
 [[ -n "$selection" ]] || exit 1
 
-expand_path "$selection"
+target="$(expand_path "$selection")"
+[[ -n "$target" ]] || exit 1
+
+if is_worktree_root "$target"; then
+    pick_worktree "$target" || printf '%s\n' "$target"
+else
+    printf '%s\n' "$target"
+fi
