@@ -15,6 +15,7 @@ export PATH="$PATH:${SAR_SCRIPT_ROOT}"
 
 export PATH="$PATH:${SAR_SCRIPT_ROOT}/dev"
 export PATH="$PATH:${SAR_SCRIPT_ROOT}/devops"
+export PATH="$PATH:${SAR_SCRIPT_ROOT}/util"
 
 if command -v zfs >/dev/null 2>&1; then
     export PATH="$PATH:${SAR_SCRIPT_ROOT}/zfs"
