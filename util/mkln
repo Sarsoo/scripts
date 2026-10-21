@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+target_path="$1"
+link_name="$2"
+
+if [[ -z "${target_path}" ]]; then
+  echo "no source" >&2
+  exit 1
+fi
+
+if [[ -z "${link_name}" ]]; then
+  echo "no destination" >&2
+  exit 1
+fi
+
+target_path=$(realpath "${target_path}")
+link_name=$(realpath "${link_name}")
+
+target=$(basename "${target_path}")
+
+mv "${target_path}" "${link_name}/${target}"
+if [[ $? != 0 ]]; then
+  echo "failed to move ${target_path} to ${link_name}" >&2
+  exit 1
+fi
+
+ln -s "${link_name}/${target}" "${target_path}"
+if [[ $? != 0 ]]; then
+  echo "failed to link ${link_name} as ${target_path}" >&2
+  exit 1
+fi
