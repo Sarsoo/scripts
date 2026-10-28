@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# sarsoo: summary="Update script checkout"
+# sarsoo: visibility="public"
+
+set -ueo pipefail
+
+if [[ "${1:-}" == "--help" ]]; then
+    cat <<EOF
+Usage: so update
+
+Update the local checkout of scripts
+EOF
+    exit 0
+fi
+
+pushd "${SARSOO_LIB_DIR}/.." >/dev/null
+git pull
+popd >/dev/null
