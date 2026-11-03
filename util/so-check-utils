@@ -5,8 +5,8 @@
 function check-installed() {
   local name="$1"
 
-  if command -v "$name" &>/dev/null; then
-    echo "$name ✅$(whereis $name | cut -d':' -f2)"
+  if command -v "${name}" &>/dev/null; then
+    echo "$name ✅$(whereis "${name}" | cut -d':' -f2)"
   else
     echo "$name ❌"
   fi
@@ -27,21 +27,28 @@ check-installed 'ranger'
 check-installed 'delta'
 check-installed 'tmux'
 check-installed 'rg'
+check-installed 'fd'
+check-installed 'bat'
+check-installed 'eza'
 check-installed 'starship'
 check-installed 'vja'
 check-installed 'gitui'
 check-installed 'lazygit'
+check-installed 'bwrap'
 
 echo ''
 echo '>> DEV'
 check-installed 'uv'
+check-installed 'nvm'
 check-installed 'npm'
 check-installed 'node'
 
 echo ''
-echo '>> NET'
+echo '>> NETWORK'
 check-installed 'openssl'
 check-installed 'dig'
+check-installed 'nc'
+check-installed 'telnet'
 check-installed 'mtr'
 check-installed 'trip'
 check-installed 'termshark'
@@ -53,10 +60,17 @@ check-installed 'helm'
 check-installed 'k9s'
 check-installed 'flux9s'
 check-installed 'aws'
+
+echo ''
+echo '>> CONTAINER'
 check-installed 'docker'
 check-installed 'podman'
 check-installed 'skopeo'
 check-installed 'buildah'
+
+echo ''
+echo '>> DATA'
+check-installed 'pgcli'
 
 echo ''
 echo '>> AI'
@@ -68,3 +82,4 @@ echo ''
 echo '>> INFRA'
 check-installed 'zfs'
 check-installed 'zpool'
+check-installed 'machinectl'

@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-: "${1:?'no url given'}"
-
-youtube-dl --config-location ~/.config/youtube-dl/audioconfig $1

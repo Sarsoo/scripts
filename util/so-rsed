@@ -1,4 +1,27 @@
 #!/usr/bin/env bash
+# sarsoo: summary="recursive sed"
+# sarsoo: visibility="public"
+
+usage() {
+  cat <<'EOF'
+Usage: so rsed [options] [positionals]
+
+Recursive sed
+
+Options:
+  -f, --file  PATTERN       Chart directory (default: .)
+  -s, --sed   TEMPLATE      Directory to output templates to (default: ./templated)
+EOF
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+  esac
+done
 
 file=""
 sed=""
@@ -18,7 +41,8 @@ done
 
 : "${file:?}" "${sed:?}"
 
-case "$(uname -s)" in
+unameOut="$(uname -s)"
+case "${unameOut}" in
     Darwin*)    machine=Mac;;
     *)          machine="UNKNOWN:${unameOut}"
 esac

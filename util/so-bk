@@ -21,8 +21,8 @@ set -uo pipefail
 
 bk_file="${BK_FILE:-$HOME/.bk}"
 
-if [[ "${1:-}" == "--help" ]]; then
-    cat <<EOF
+usage() {
+  cat <<EOF
 Usage: so bk
 
 Pick a bookmarked directory with fzf and print it to stdout.
@@ -32,16 +32,24 @@ per line. Blank lines and lines starting with '#' are ignored.
 Entries may use a leading ~ (for \$HOME) and \$VAR / \${VAR} expansion.
 
 Examples:
-  bk              change the current directory (via the ~/.sarc function)
-  cd "\$(so bk)"   compose it yourself
+bk              change the current directory (via the ~/.sarc function)
+cd "\$(so bk)"   compose it yourself
 
 If a picked bookmark is the root of a git worktree tree (as created by
- git-wtclone), a second fzf picker lists its worktrees; the selected worktree
- path is printed instead of the root. Cancelling that second picker prints
- the tree root.
+git-wtclone), a second fzf picker lists its worktrees; the selected worktree
+path is printed instead of the root. Cancelling that second picker prints
+the tree root.
 EOF
-    exit 0
-fi
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+  esac
+done
 
 if [[ ! -f "$bk_file" ]]; then
     printf 'err: bookmark file not found: %s\n' "$bk_file" >&2

@@ -4,6 +4,6 @@
 
 cmds=(code goland embeddings rider pycharm jetbrains)
 for i in "${cmds[@]}"; do
-  pgrep -la $i
-  pkill -9 $i
+  pgrep -la "$i"
+  pkill -9 "$i"
 done
