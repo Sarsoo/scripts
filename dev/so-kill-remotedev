@@ -2,7 +2,7 @@
 # sarsoo: summary="Kill remote dev servers"
 # sarsoo: visibility="public"
 
-cmds=(code goland embeddings rider pycharm jetbrains)
+cmds=(code goland embeddings rider pycharm jetbrains java)
 for i in "${cmds[@]}"; do
   pgrep -la "$i"
   pkill -9 "$i"
