@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# sarsoo: summary="Update hindsight coding agent"
+# sarsoo: visibility="public"
+set -euo pipefail
+
+npx @vectorize-io/hindsight-coding-agents update
